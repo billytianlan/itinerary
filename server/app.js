@@ -4,7 +4,7 @@ var session = require('express-session');
 var db = require('./db');
 
 // Middleware
-var parser = require('body-parser');
+var bodyParser = require('body-parser');
 
 // Routes
 var router = require('./routes.js');
@@ -12,7 +12,9 @@ var router = require('./routes.js');
 var app = express();
 module.exports.app = app;
 
-app.use(parser.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(session({
   secret: 'shhh, it\'s a secret',

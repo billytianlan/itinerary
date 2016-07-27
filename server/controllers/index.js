@@ -23,18 +23,24 @@ module.exports = {
   ************************************************/
   users: {
     login: function(req, res) {
-      db.User.findOne({ where: { name: req.body.username } })
+      console.log('the req body:', req.body);
+      var username = req.body.username
+      var password = req.body.password
+      db.User.findOne({ where: { name: username } })
       .then(function(user) {
         if (!user) {
           console.log('user does not exist!');
           return;
         }
-        bcrypt.compare(req.body.password, user.dataValues.password, function(err, match) {
+        bcrypt.compare(password, user.dataValues.password, function(err, match) {
           if (match) {
             console.log('login successful');
             util.createSession(req, res, user);
           } else {
-            console.log('password incorrect');
+            var data = {
+              authenticated: false
+            }
+            res.status(400).send(JSON.stringify(data));
           }
         });
       });

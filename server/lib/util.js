@@ -2,9 +2,12 @@ var createSession = function(req, res, newUser) {
   return req.session.regenerate(function() {
     req.session.loggedIn = true;
     req.session.save(function(err) {
-	    console.log('in util', req.session);
 	    res.set('Set-Cookie', 'a cookie');
-	    res.sendStatus(201);
+      var data = {
+        username: newUser.dataValues.name,
+        authenticated: true
+      }
+	    res.status(201).send(JSON.stringify(data));
     });
   })
 }

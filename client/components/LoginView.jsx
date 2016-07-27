@@ -4,9 +4,8 @@ class LoginView extends React.Component {
     super(props);
 
     this.state = {
-      username: '',
-      password: ''
-    };
+      authenticated: null
+    }
 
     this.serverRequest = function ajax(url, data) {
       // If second parameter is empty function performs a GET request
@@ -19,33 +18,33 @@ class LoginView extends React.Component {
         credentials: 'same-origin',
         method: method,
         body: JSON.stringify(data)
-      }, this)
-        .then(res => {
-          console.log('Successful clientside POST-request', res);
-          if(url === 'http://localhost:3000/classes/login' && res.status === 201) {
-            window.user = this.state.username;
-            console.log('redirecting');
-            window.location.hash = 'landing';
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        if (data.authenticated) {
+          window.user = data.username;
+          window.location.hash = 'landing';
+        } else {
+          this.setState({
+            authenticated: false
+          })
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
     }.bind(this);
-
-    this.handleInputChange = event => {
-      console.log(event.target.id);
-      var newState = {};
-      newState[event.target.id] = event.target.value;
-      this.setState(newState);
-    };
 
     this.submitLogin = event => {
       event.preventDefault();
-      console.log(event);
+
+      let username = document.getElementById('username').value;
+      let password = document.getElementById('password').value;
       var data = {
-        username: this.state.username,
-        password: this.state.password
+        username: username,
+        password: password
       };
       this.serverRequest('http://localhost:3000/classes/login', data);
     };
@@ -60,11 +59,12 @@ class LoginView extends React.Component {
   render() {
     return (
       <div className="container centerText">
-        <form className="form-login" onSubmit={this.submitLogin}>
+        <form id="myForm" className="form-login" onSubmit={this.submitLogin}>
           <h2>Login</h2>
-          <input id="username" className="form-control" type="text" onChange={this.handleInputChange} placeholder="Username"/>
-          <input id="password" className="form-control" type="password" onChange={this.handleInputChange} placeholder="Password"/>
+          <input name="username" id="username" className="form-control" type="text" placeholder="Username"/>
+          <input name="password" id="password" className="form-control" type="password" placeholder="Password"/>
           <button className="btn btn-success btn-block" type="submit" value="Save">Login</button>
+          <p className={this.state.authenticated === false ? '' : 'hide'}> Incorrect username or password </p>
         </form>
       </div>
     );
