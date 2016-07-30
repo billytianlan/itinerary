@@ -25,7 +25,7 @@ app.use(session({
 app.use('/classes', router);
 
 // Serve the client files
-app.use(express.static(__dirname + '/../public'));
+app.use(express.static(__dirname + '/../client'));
 
 var url = process.env.PORT || 3000;
 app.listen(url, function () {
